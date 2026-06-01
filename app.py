@@ -15,17 +15,15 @@ app = Flask(__name__, static_url_path='', static_folder='.')
 # ==========================================
 # 1. NEW: SECURITY & DATABASE CONFIGURATION
 # ==========================================
-# Required for secure login sessions
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default_secret_key')
-# Tells Python to use the Cloud Database if available, otherwise use local SQLite
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///database.db')
+
 # FIX: Render/Postgres strings often start with 'postgres://', but SQLAlchemy needs 'postgresql://'
 if app.config['SQLALCHEMY_DATABASE_URI'].startswith("postgres://"):
     app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace("postgres://", "postgresql://", 1)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# CRITICAL: supports_credentials=True allows the browser to remember you are logged in
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
 db = SQLAlchemy(app)
@@ -44,7 +42,27 @@ client = OpenAI(
 # ==========================================
 # 3. NEW: DATABASE TABLES
 # ==========================================
-# ... (User and Expense classes remain same) ...
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fullname = db.Column(db.String(100))
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    expenses = db.relationship('Expense', backref='owner', lazy=True)
+
+class Expense(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    date = db.Column(db.String(50))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# Generate the database file when the app starts
+with app.app_context():
+    db.create_all()
 
 # ==========================================
 # 4. FRONTEND ROUTES (For Hosting)
@@ -52,6 +70,14 @@ client = OpenAI(
 @app.route('/')
 def serve_index():
     return send_from_directory('.', 'index.html')
+
+@app.route('/auth.html')
+def serve_auth():
+    return send_from_directory('.', 'auth.html')
+
+@app.route('/dashboard.html')
+def serve_dashboard():
+    return send_from_directory('.', 'dashboard.html')
 
 @app.route('/<path:path>')
 def serve_static(path):
@@ -62,27 +88,35 @@ def serve_static(path):
 # ==========================================
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.json
-    if User.query.filter_by(email=data['email']).first():
-        return jsonify({"message": "Email already exists!"}), 400
-    
-    hashed_pw = generate_password_hash(data['password'], method='pbkdf2:sha256')
-    new_user = User(fullname=data['fullname'], email=data['email'], password=hashed_pw)
-    
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({"message": "Account created successfully!"})
+    try:
+        data = request.json
+        if User.query.filter_by(email=data['email']).first():
+            return jsonify({"message": "Email already exists!"}), 400
+        
+        hashed_pw = generate_password_hash(data['password'], method='pbkdf2:sha256')
+        new_user = User(fullname=data['fullname'], email=data['email'], password=hashed_pw)
+        
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({"message": "Account created successfully!"})
+    except Exception as e:
+        print(f"Registration error: {e}")
+        return jsonify({"message": "Internal server error during registration"}), 500
 
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.json
-    user = User.query.filter_by(email=data['email']).first()
-    
-    if user and check_password_hash(user.password, data['password']):
-        login_user(user)
-        return jsonify({"message": "Login successful!"})
-    
-    return jsonify({"message": "Invalid email or password"}), 401
+    try:
+        data = request.json
+        user = User.query.filter_by(email=data['email']).first()
+        
+        if user and check_password_hash(user.password, data['password']):
+            login_user(user)
+            return jsonify({"message": "Login successful!"})
+        
+        return jsonify({"message": "Invalid email or password"}), 401
+    except Exception as e:
+        print(f"Login error: {e}")
+        return jsonify({"message": "Internal server error during login"}), 500
 
 @app.route('/logout')
 @login_required
@@ -118,9 +152,8 @@ def get_expenses():
 # 6. YOUR MODIFIED AI ROUTE
 # ==========================================
 @app.route('/analyze', methods=['POST'])
-@login_required # Makes sure only logged-in users can use the AI
+@login_required
 def analyze_expenses():
-    # Now it pulls directly from your permanent database!
     user_expenses = Expense.query.filter_by(user_id=current_user.id).all()
 
     if not user_expenses:
@@ -150,7 +183,7 @@ def analyze_expenses():
         
     except Exception as e:
         print(f"❌ GROQ ERROR: {e}") 
-        return jsonify({"reply": "Groq had a hiccup! Check your terminal."})
+        return jsonify({"reply": "Groq had a hiccup!"})
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
