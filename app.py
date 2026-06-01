@@ -47,6 +47,7 @@ class User(UserMixin, db.Model):
     fullname = db.Column(db.String(100))
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
     expenses = db.relationship('Expense', backref='owner', lazy=True)
 
 class Expense(db.Model):
@@ -78,6 +79,13 @@ def serve_auth():
 @app.route('/dashboard.html')
 def serve_dashboard():
     return send_from_directory('.', 'dashboard.html')
+
+@app.route('/admin.html')
+@login_required
+def serve_admin():
+    if not current_user.is_admin:
+        return "Access Denied", 403
+    return send_from_directory('.', 'admin.html')
 
 @app.route('/<path:path>')
 def serve_static(path):
@@ -111,7 +119,10 @@ def login():
         
         if user and check_password_hash(user.password, data['password']):
             login_user(user)
-            return jsonify({"message": "Login successful!"})
+            return jsonify({
+                "message": "Login successful!",
+                "is_admin": user.is_admin
+            })
         
         return jsonify({"message": "Invalid email or password"}), 401
     except Exception as e:
@@ -125,7 +136,30 @@ def logout():
     return jsonify({"message": "Logged out!"})
 
 # ==========================================
-# 5. NEW: DATABASE EXPENSE ROUTES
+# 6. ADMIN ROUTES
+# ==========================================
+@app.route('/admin/users', methods=['GET'])
+@login_required
+def get_all_users():
+    if not current_user.is_admin:
+        return jsonify({"message": "Unauthorized"}), 403
+    
+    users = User.query.filter_by(is_admin=False).all()
+    output = [{"id": u.id, "fullname": u.fullname, "email": u.email} for u in users]
+    return jsonify({"users": output})
+
+@app.route('/admin/user/<int:user_id>/expenses', methods=['GET'])
+@login_required
+def get_user_expenses_admin(user_id):
+    if not current_user.is_admin:
+        return jsonify({"message": "Unauthorized"}), 403
+    
+    user_expenses = Expense.query.filter_by(user_id=user_id).all()
+    output = [{"id": exp.id, "name": exp.name, "amount": exp.amount, "date": exp.date} for exp in user_expenses]
+    return jsonify({"expenses": output})
+
+# ==========================================
+# 7. NEW: DATABASE EXPENSE ROUTES
 # ==========================================
 @app.route('/save-expense', methods=['POST'])
 @login_required

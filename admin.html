@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Manager - Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+    <!-- Sidebar for User List -->
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <div id="user-list-container" style="margin-top: 20px;">
+            <p style="padding-left: 20px; color: #7f8c8d;">Registered Users:</p>
+            <div id="user-list" style="display: flex; flex-direction: column; gap: 5px; margin-top: 10px;">
+                <!-- User items will appear here -->
+                <p style="padding-left: 20px; font-size: 0.9em; color: #bdc3c7;">Loading users...</p>
+            </div>
+        </div>
+        <a href="#" id="admin-logout" class="logout" style="margin-top: auto;">Logout</a>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <header>
+            <h1 id="selected-user-name">Welcome, Admin</h1>
+            <p id="selected-user-email">Select a user from the sidebar to view their expenses.</p>
+        </header>
+
+        <div class="expense-history" style="margin-top: 30px;">
+            <h2>User Expense History</h2>
+            <table class="expense-table">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Date</th>
+                        <th>Expense Name</th>
+                        <th>Amount Spent (₹)</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-expense-list">
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #7f8c8d;">No user selected</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

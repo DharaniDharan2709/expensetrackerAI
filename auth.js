@@ -36,7 +36,11 @@ document.getElementById('login-submit').addEventListener('click', async () => {
         const data = await response.json();
 
         if (response.ok) {
-            window.location.href = "dashboard.html";
+            if (data.is_admin) {
+                window.location.href = "admin.html";
+            } else {
+                window.location.href = "dashboard.html";
+            }
         } else {
             alert(data.message || "Login failed");
         }
