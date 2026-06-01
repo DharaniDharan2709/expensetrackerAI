@@ -34,9 +34,13 @@ document.getElementById('login-submit').addEventListener('click', async () => {
         });
 
         const data = await response.json();
+        console.log("Login Response Data:", data); // Helpful for developers
 
         if (response.ok) {
-            if (data.is_admin) {
+            // DEBUG ALERT: You can remove this after it works!
+            alert("Login Success! Admin Status: " + data.is_admin);
+
+            if (data.is_admin === true) {
                 window.location.href = "admin.html";
             } else {
                 window.location.href = "dashboard.html";
