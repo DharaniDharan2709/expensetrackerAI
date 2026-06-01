@@ -1,0 +1,8 @@
+.env
+database.db
+__pycache__/
+.venv/
+.venv-1/
+.venv-2/
+instance/
+test_auth.py
