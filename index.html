@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Manager - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-body">
+
+    <div class="auth-container">
+        
+        <div id="login-panel" class="auth-box">
+            <h2>Welcome Back</h2>
+            <p class="subtitle">Log in to your Expense Manager</p>
+
+            <div class="input-group">
+                <input type="email" id="login-email" placeholder="Email Address" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="login-password" placeholder="Password" required>
+            </div>
+
+            <button id="login-submit" class="login-btn">Login</button>
+
+            <p class="toggle-text">
+                New here? <span id="show-register" class="toggle-link">Register a new account</span>
+            </p>
+        </div>
+
+        <div id="register-panel" class="auth-box" style="display: none;">
+            <h2>Create Account</h2>
+            <p class="subtitle">Start tracking your expenses today</p>
+
+            <div class="input-group">
+                <input type="text" id="reg-fullname" placeholder="Full Name" required>
+            </div>
+            <div class="input-group">
+                <input type="email" id="reg-email" placeholder="Email (e.g., @gmail.com)" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="reg-password" placeholder="Create Password" required>
+            </div>
+
+            <button id="register-submit" class="login-btn">Register</button>
+
+            <p class="toggle-text">
+                Already have an account? <span id="show-login" class="toggle-link">Login here</span>
+            </p>
+        </div>
+
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>

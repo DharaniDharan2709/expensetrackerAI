@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Manager - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+    <!-- 1. The Left Sidebar Navigation -->
+    <div class="sidebar">
+        <h2>Expense Manager</h2>
+        <a href="#" class="active">Dashboard</a>
+        <a href="#" id="open-transactions">Transactions</a>
+        <a href="#" id="open-settings">Settings</a>
+        <a href="#" id="open-ai-chat" style="color: #a8e6cf; font-weight: bold;">✨ Analyse with AI</a>
+        <a href="#" id="logout-link" class="logout">Logout</a>
+    </div>
+
+    <!-- 2. The Main Content Area -->
+    <div class="main-content">
+        <header>
+            <h1>Dashboard</h1>
+            <div class="budget-input-area">
+                <label for="budget">Enter the budget: </label>
+                <input type="number" id="budget" placeholder="e.g. 5000">
+            </div>
+        </header>
+
+        <!-- 3. Balance & AI Advisor Area -->
+        <div class="balance-wrapper" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 50px;">
+            
+            <div class="card balance-card">
+                <h3>Balance Amount</h3>
+                <p>₹0.00</p> 
+            </div>
+
+            <div class="card ai-card">
+                <h3>🤖 AI Advisor</h3>
+                <p id="ai-advice-text">👋 Hello! Set a budget to get personalized financial advice.</p>
+            </div>
+
+        </div>
+
+        <!-- 4. Enter Expense Section -->
+        <div class="expense-section">
+            <h2>Enter Expense</h2>
+            <div class="expense-box">
+                <div class="input-group">
+                    <input type="text" id="expense-name" placeholder="Name of the expense" required>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="expense-amount" placeholder="Enter money spent" required>
+                </div>
+                <button type="button" id="update-btn" class="login-btn">Update</button>
+            </div>
+        </div>
+
+        <!-- 5. Dashboard Mini-Table -->
+        <div class="expense-history">
+            <h2>Expense History</h2>
+            <table class="expense-table">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Expense Name</th>
+                        <th>Amount Spent (₹)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="expense-list"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 6. The Settings Popup (Modal) -->
+    <div id="settings-modal" class="modal-overlay">
+        <div class="modal-box">
+            <span id="close-settings" class="close-btn">&times;</span>
+            <h2>Settings</h2>
+            <div class="setting-option">
+                <p>Appearance: Dark Theme</p>
+                <button id="dark-mode-toggle" class="login-btn" style="width: auto; padding: 10px 20px;">🌙 Enable</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. Transactions Popup (Modal) -->
+    <div id="transactions-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 90%; width: 1000px;">
+            <span id="close-transactions" class="close-btn">&times;</span>
+            <h2>Detailed Transaction History</h2>
+            
+            <div class="transaction-table-wrapper">
+                <table class="expense-table">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Date</th>
+                            <th>Expense Name</th>
+                            <th>Notes</th>
+                            <th>Amount Spent (₹)</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="full-transaction-list">
+                        <!-- Detailed rows go here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 8. The AI Chat Modal -->
+    <div id="ai-chat-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 600px; height: 80vh; display: flex; flex-direction: column;">
+            <span id="close-ai-chat" class="close-btn">&times;</span>
+            <h2 style="color: #3498db;">🤖 AI Financial Analyst</h2>
+            
+            <!-- Where the chat text will appear -->
+            <div id="chat-window" style="flex: 1; overflow-y: auto; background: #f9fbfd; border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 20px; border: 1px solid #ccd1d9; white-space: pre-wrap;">
+                Hello! I am your AI Financial Advisor. Click the button below to send me your current expense sheet, and I will give you a full analysis!
+            </div>
+
+            <!-- The trigger button -->
+            <button id="run-analysis-btn" class="login-btn" style="background-color: #27ae60;">📊 Analyze My Expenses Now</button>
+        </div>
+    </div>
+
+    <!-- Link the Javascript at the very end -->
+    <script src="script.js"></script>
+</body>
+</html>
