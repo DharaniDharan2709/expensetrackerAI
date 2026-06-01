@@ -125,10 +125,17 @@ def login():
         user = User.query.filter_by(email=data['email']).first()
         
         if user and check_password_hash(user.password, data['password']):
+            # --- AUTO-ADMIN LOGIC ---
+            # Automatically promotes this specific email to Admin
+            if user.email == 'indoorgaming22@gmail.com' and not user.is_admin:
+                user.is_admin = True
+                db.session.commit()
+                print(f"✅ Promoted {user.email} to Admin automatically.")
+
             login_user(user)
             return jsonify({
                 "message": "Login successful!",
-                "is_admin": user.is_admin
+                "is_admin": bool(user.is_admin) # Ensure it's a clear boolean
             })
         
         return jsonify({"message": "Invalid email or password"}), 401
