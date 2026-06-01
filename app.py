@@ -64,6 +64,13 @@ def load_user(user_id):
 # Generate the database file when the app starts
 with app.app_context():
     db.create_all()
+    # AUTOMATIC MIGRATION: Try to add is_admin column if it doesn't exist
+    try:
+        from sqlalchemy import text
+        db.session.execute(text('ALTER TABLE "user" ADD COLUMN is_admin BOOLEAN DEFAULT FALSE'))
+        db.session.commit()
+    except Exception:
+        db.session.rollback() # Column likely already exists
 
 # ==========================================
 # 4. FRONTEND ROUTES (For Hosting)
@@ -181,6 +188,17 @@ def get_expenses():
     user_expenses = Expense.query.filter_by(user_id=current_user.id).all()
     output = [{"id": exp.id, "name": exp.name, "amount": exp.amount, "date": exp.date} for exp in user_expenses]
     return jsonify({"expenses": output})
+
+@app.route('/delete-expense/<int:expense_id>', methods=['DELETE'])
+@login_required
+def delete_expense(expense_id):
+    expense = Expense.query.filter_by(id=expense_id, user_id=current_user.id).first()
+    if not expense:
+        return jsonify({"message": "Expense not found"}), 404
+    
+    db.session.delete(expense)
+    db.session.commit()
+    return jsonify({"message": "Expense deleted!"})
 
 # ==========================================
 # 6. YOUR MODIFIED AI ROUTE

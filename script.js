@@ -95,6 +95,7 @@ function updateUI() {
                 <td>${index + 1}</td>
                 <td>${exp.name}</td>
                 <td style="font-weight:bold;">₹${exp.amount.toFixed(2)}</td>
+                <td><button class="delete-btn" onclick="deleteExpense(${exp.id})">🗑️ Delete</button></td>
             </tr>
         `;
         expenseList.innerHTML += rowHtml;
@@ -106,6 +107,7 @@ function updateUI() {
                 <td>${exp.name}</td>
                 <td>---</td>
                 <td style="font-weight:bold;">₹${exp.amount.toFixed(2)}</td>
+                <td><button class="delete-btn" onclick="deleteExpense(${exp.id})">🗑️ Delete</button></td>
             </tr>
         `;
     });
@@ -118,6 +120,28 @@ function updateUI() {
     } else {
         aiAdviceText.innerText = "✅ Looking good! Keep tracking your expenses.";
         aiAdviceText.style.color = "#2c3e50";
+    }
+}
+
+// ==========================================
+// 4. DELETE EXPENSE FROM DATABASE
+// ==========================================
+async function deleteExpense(id) {
+    if(!confirm("Are you sure you want to delete this expense?")) return;
+
+    try {
+        const response = await fetch(`/delete-expense/${id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            await loadExpenses(); // Refresh list
+        } else {
+            alert("Could not delete expense.");
+        }
+    } catch (e) {
+        alert("Server error.");
     }
 }
 
