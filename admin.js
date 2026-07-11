@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://DharaniGUs.pythonanywhere.com'; // CHANGE THIS TO YOUR PYTHONANYWHERE URL BEFORE DEPLOYING
+const API_BASE_URL = ''; // Leave empty for Render deployment (Flask serves everything)
 
 const userList = document.getElementById('user-list');
 const expenseList = document.getElementById('admin-expense-list');

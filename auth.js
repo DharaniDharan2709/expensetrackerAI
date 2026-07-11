@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://127.0.0.1:5000'; // CHANGE THIS TO YOUR PYTHONANYWHERE URL BEFORE DEPLOYING
+const API_BASE_URL = ''; // Leave empty for Render deployment (Flask serves everything)
 
 // Grab the panels
 const loginPanel = document.getElementById('login-panel');

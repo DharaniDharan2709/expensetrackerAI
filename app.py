@@ -1,27 +1,25 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, send_from_directory
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from openai import OpenAI
 
-app = Flask(__name__)
+load_dotenv()
+
+# Flask serves your HTML/CSS/JS files directly from this folder
+app = Flask(__name__, static_folder='.', static_url_path='')
 
 # ==========================================
-# 1. NEW: SECURITY & DATABASE CONFIGURATION
+# 1. SECURITY & DATABASE CONFIGURATION
 # ==========================================
-# Required for secure login sessions
-app.config['SECRET_KEY'] = 'dharani_secret_key_2026'
-# Tells Python to create a 'database.db' file in your folder
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dharani_secret_key_2026')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# CRITICAL: supports_credentials=True allows the browser to remember you are logged in
-load_dotenv()
-frontend_url = os.environ.get('FRONTEND_URL', 'http://127.0.0.1:5500')
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": [frontend_url, "http://localhost:5500", "http://127.0.0.1:5000", "http://localhost:5000"]}})
+CORS(app, supports_credentials=True)
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
@@ -29,8 +27,7 @@ login_manager = LoginManager(app)
 # ==========================================
 # 2. YOUR GROQ SETUP
 # ==========================================
-# Paste your NEW Groq API key inside the quotes
-GROQ_API_KEY = "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"
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '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')
 
 client = OpenAI(
     api_key=GROQ_API_KEY,
@@ -183,6 +180,17 @@ Category — Amount
     except Exception as e:
         print(f"❌ GROQ ERROR: {e}") 
         return jsonify({"reply": "Groq had a hiccup! Check your terminal."})
+
+# ==========================================
+# 7. SERVE HTML PAGES
+# ==========================================
+@app.route('/')
+def serve_index():
+    return send_from_directory('.', 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    return send_from_directory('.', path)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
