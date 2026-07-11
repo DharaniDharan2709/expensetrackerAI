@@ -3,13 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Manager - Admin Dashboard</title>
+    <title>Expense Manager AI - Admin Dashboard</title>
+    
+    <!-- Premium Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="dashboard-body">
 
+    <!-- Apple Music Lyric Style Ambient Background -->
+    <div class="ambient-background">
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+        <div class="ambient-orb orb-3"></div>
+        <div class="ambient-orb orb-4"></div>
+        <div class="ambient-particle particle-1">Health</div>
+        <div class="ambient-particle particle-2">AI Insights</div>
+        <div class="ambient-particle particle-3">Budget</div>
+    </div>
+
+    <!-- Mobile Navigation Bar (Hidden on Desktop) -->
+    <nav class="mobile-navbar glass-panel">
+        <div class="mobile-logo">Expense Tracker</div>
+        <button id="mobile-menu-btn" class="hamburger-btn">☰</button>
+    </nav>
+
     <!-- Sidebar for User List -->
-    <div class="sidebar">
+    <div id="sidebar" class="sidebar glass-panel">
         <h2>Admin Panel</h2>
         <div id="user-list-container" style="margin-top: 20px;">
             <p style="padding-left: 20px; color: #7f8c8d;">Registered Users:</p>
@@ -18,7 +41,7 @@
                 <p style="padding-left: 20px; font-size: 0.9em; color: #bdc3c7;">Loading users...</p>
             </div>
         </div>
-        <a href="#" id="admin-logout" class="logout" style="margin-top: auto;">Logout</a>
+        <a href="#" id="admin-logout" class="premium-btn" style="margin-top: auto; align-self: center; width: 80%; text-align: center; padding: 10px; font-size: 14px; border-radius: 8px;">Logout</a>
     </div>
 
     <!-- Main Content Area -->
@@ -30,7 +53,7 @@
 
         <div class="expense-history" style="margin-top: 30px;">
             <h2>User Expense History</h2>
-            <table class="expense-table">
+            <table class="expense-table glass-panel">
                 <thead>
                     <tr>
                         <th>S.No</th>

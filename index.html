@@ -3,16 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Manager - Login</title>
+    <title>Expense Manager AI - Login</title>
+    
+    <!-- Premium Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="auth-body">
 
+    <!-- Apple Music Lyric Style Ambient Background -->
+    <div class="ambient-background">
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+        <div class="ambient-orb orb-3"></div>
+        <div class="ambient-orb orb-4"></div>
+        <!-- Floating text particles -->
+        <div class="ambient-particle particle-1">Health</div>
+        <div class="ambient-particle particle-2">AI Insights</div>
+        <div class="ambient-particle particle-3">Budget</div>
+    </div>
+
+    <!-- Glassmorphism Container -->
     <div class="auth-container">
         
-        <div id="login-panel" class="auth-box">
+        <div id="login-panel" class="auth-box glass-panel">
+            <div class="auth-logo">✨ Expense AI</div>
             <h2>Welcome Back</h2>
-            <p class="subtitle">Log in to your Expense Manager</p>
+            <p class="subtitle">Log in to your intelligent financial workspace</p>
 
             <div class="input-group">
                 <input type="email" id="login-email" placeholder="Email Address" required>
@@ -21,16 +41,17 @@
                 <input type="password" id="login-password" placeholder="Password" required>
             </div>
 
-            <button id="login-submit" class="login-btn">Login</button>
+            <button id="login-submit" class="login-btn premium-btn">Sign In</button>
 
             <p class="toggle-text">
-                New here? <span id="show-register" class="toggle-link">Register a new account</span>
+                New to Expense AI? <span id="show-register" class="toggle-link">Create an account</span>
             </p>
         </div>
 
-        <div id="register-panel" class="auth-box" style="display: none;">
+        <div id="register-panel" class="auth-box glass-panel" style="display: none; opacity: 0; transform: translateY(20px);">
+            <div class="auth-logo">✨ Expense AI</div>
             <h2>Create Account</h2>
-            <p class="subtitle">Start tracking your expenses today</p>
+            <p class="subtitle">Start tracking your expenses intelligently</p>
 
             <div class="input-group">
                 <input type="text" id="reg-fullname" placeholder="Full Name" required>
@@ -42,10 +63,10 @@
                 <input type="password" id="reg-password" placeholder="Create Password" required>
             </div>
 
-            <button id="register-submit" class="login-btn">Register</button>
+            <button id="register-submit" class="login-btn premium-btn">Get Started</button>
 
             <p class="toggle-text">
-                Already have an account? <span id="show-login" class="toggle-link">Login here</span>
+                Already have an account? <span id="show-login" class="toggle-link">Sign In here</span>
             </p>
         </div>
 

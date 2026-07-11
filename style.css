@@ -1,8 +1,21 @@
 /* =========================================
    GLOBAL & LOGIN STYLES
    ========================================= */
+:root {
+    --fintech-navy: #150914; /* Deep dark purple */
+    --fintech-teal: #8c1c4e; /* Dark pink/magenta */
+    --fintech-emerald: #5a0c24; /* Deep ruby red */
+    --fintech-gold: #380e2b; /* Deep plum */
+    
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.25);
+    --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    --text-primary: #FFFFFF;
+    --text-secondary: #9CA3AF;
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     background-color: #f0f4f8;
     display: flex;
     justify-content: center;
@@ -82,22 +95,24 @@ body {
     align-items: stretch;
     height: 100vh;
     margin: 0;
-    background-color: #f0f4f8;
-    transition: background-color 0.3s ease; /* Smooth dark mode transition */
+    background-color: var(--fintech-navy);
+    position: relative;
+    overflow: hidden;
+    color: var(--text-primary);
 }
 
 /* Sidebar Styling */
 .sidebar {
     width: 250px;
-    background-color: #2c3e50;
-    color: white;
-    padding-top: 20px;
-    transition: background-color 0.3s ease;
+    z-index: 10;
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar h2 {
     text-align: center;
-    color: #3498db; 
+    color: var(--fintech-teal); 
     margin-bottom: 40px;
     letter-spacing: 1px;
 }
@@ -112,9 +127,9 @@ body {
 }
 
 .sidebar a:hover, .sidebar a.active {
-    background-color: #34495e;
+    background-color: rgba(255,255,255,0.1);
     color: white;
-    border-left: 4px solid #3498db; 
+    border-radius: 8px;
 }
 
 .sidebar .logout {
@@ -125,27 +140,29 @@ body {
 /* Main Content Area */
 .main-content {
     flex: 1; 
-    padding: 40px;
+    padding: 20px 40px;
     overflow-y: auto; 
+    z-index: 10;
 }
 
 .main-content header h1 {
     margin-top: 0;
-    color: #2c3e50;
+    color: var(--text-primary);
     margin-bottom: 10px;
 }
 
-/* Budget Input Area */
 .budget-input-area {
     margin-bottom: 40px;
     font-size: 18px;
-    color: #2c3e50;
+    color: var(--text-secondary);
     font-weight: bold;
 }
 
 .budget-input-area input {
     padding: 10px;
-    border: 1px solid #ccd1d9;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.2);
+    color: white;
     border-radius: 6px;
     font-size: 16px;
     margin-left: 10px;
@@ -162,13 +179,10 @@ body {
 }
 
 .balance-card {
-    background-color: #2c3e50;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     width: 100%;
     max-width: 350px;
     text-align: center;
+    padding: 30px;
 }
 
 .balance-card h3 {
@@ -196,18 +210,14 @@ body {
 }
 
 .expense-section h2 {
-    color: #2c3e50;
+    color: var(--text-primary);
     margin-bottom: 20px;
 }
 
 .expense-box {
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     width: 100%;
     max-width: 400px;
-    transition: background-color 0.3s ease;
+    padding: 30px;
 }
 
 /* =========================================
@@ -226,24 +236,23 @@ body {
     width: 90%; 
     max-width: 1200px; 
     border-collapse: collapse; 
-    background-color: white;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08); 
-    border-radius: 16px; 
     overflow: hidden; 
-    transition: background-color 0.3s ease;
+    padding: 0;
 }
 
 .expense-table th, .expense-table td {
     padding: 18px 25px; 
     text-align: left;
-    border-bottom: 1px solid #f0f4f8;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: var(--text-primary);
 }
 
 .expense-table th {
-    background-color: #3498db; 
-    color: white;
+    background-color: rgba(0,0,0,0.2); 
+    color: #ffffff;
     font-weight: bold;
     font-size: 16px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 .expense-table tr:last-child td {
@@ -251,7 +260,7 @@ body {
 }
 
 .expense-table tbody tr:hover {
-    background-color: #f9fbfd;
+    background-color: rgba(255,255,255,0.05);
 }
 
 /* Styling for the Notes column in the Transactions Popup */
@@ -281,20 +290,15 @@ body {
 }
 
 .modal-box {
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
     width: 100%;
     max-width: 400px;
     position: relative; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    transition: background-color 0.3s ease;
 }
 
 .modal-box h2 {
     margin-top: 0;
-    color: #2c3e50;
-    border-bottom: 1px solid #f0f4f8;
+    color: var(--text-primary);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
     padding-bottom: 15px;
 }
 
@@ -306,7 +310,7 @@ body {
 }
 
 .setting-option p {
-    color: #2c3e50;
+    color: var(--text-primary);
     font-weight: bold;
     margin: 0;
 }
@@ -337,60 +341,7 @@ body {
    DARK MODE STYLES (THE MASTER OVERRIDE)
    ========================================= */
 
-/* 1. Main Backgrounds */
-body.dark-mode { background-color: #121212 !important; }
-body.dark-mode .dashboard-body { background-color: #121212; }
-body.dark-mode .sidebar { background-color: #1e1e24; }
 
-/* 2. Text Colors */
-body.dark-mode h1, 
-body.dark-mode h2, 
-body.dark-mode .budget-input-area,
-body.dark-mode .setting-option p {
-    color: #ffffff;
-}
-
-/* 3. White Boxes to Dark Grey */
-body.dark-mode .expense-box, 
-body.dark-mode .expense-table,
-body.dark-mode .modal-box {
-    background-color: #1e1e24;
-    color: #e0e0e0;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-}
-
-body.dark-mode .modal-box h2 {
-    border-bottom-color: #333;
-}
-
-/* 4. Input Fields */
-body.dark-mode input {
-    background-color: #2b2b36;
-    color: white;
-    border: 1px solid #444;
-}
-
-/* 5. Table Fixes */
-body.dark-mode .expense-table th {
-    background-color: #2b2b36;
-    color: #3498db;
-}
-
-body.dark-mode .expense-table td {
-    border-bottom: 1px solid #2b2b36;
-}
-
-body.dark-mode .expense-table tbody tr:hover {
-    background-color: #2b2b36;
-}
-
-/* 6. Close Button Fixes */
-body.dark-mode .close-btn {
-    color: #e0e0e0;
-}
-body.dark-mode .close-btn:hover {
-    color: #e74c3c;
-}
 
 .delete-btn {
     background-color: #e74c3c;
@@ -408,27 +359,17 @@ body.dark-mode .close-btn:hover {
     background-color: #c0392b; /* Darker red on hover */
 }
 
-/* Dark mode adjustment for the delete button */
-body.dark-mode .delete-btn {
-    background-color: #ff5252;
-}
 
-body.dark-mode .delete-btn:hover {
-    background-color: #d50000;
-}
 /* =========================================
    AI ADVISOR STYLES
    ========================================= */
 .ai-card {
-    background: linear-gradient(135deg, #2c3e50, #4ca1af);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     width: 100%;
     max-width: 350px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    padding: 30px;
 }
 
 .ai-card h3 {
@@ -447,62 +388,293 @@ body.dark-mode .delete-btn:hover {
     transition: opacity 0.5s ease;
 }
 
-/* Dark Mode fix for the wrapper */
-body.dark-mode .ai-card {
-    background: linear-gradient(135deg, #1e1e24, #2b5876);
-}
- body.dark-mode #chat-window { background: #2b2b36; border-color: #444; color: white; }
+
  /* =========================================
-   AUTHENTICATION PAGE STYLES
+   PREMIUM FINTECH LOGIN STYLES (APPLE MUSIC INSPIRED)
 ========================================= */
+
 .auth-body {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
-    background-color: var(--bg-color);
+    background-color: var(--fintech-navy);
+    overflow: hidden; /* Prevent scrolling from ambient particles */
+    position: relative;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text-primary);
 }
 
+/* Apple Music Style Ambient Background */
+.ambient-background {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 0;
+    overflow: hidden;
+    background: radial-gradient(circle at center, var(--fintech-navy) 0%, #000000 100%);
+    will-change: transform;
+    pointer-events: none;
+}
+
+.ambient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.6;
+    animation: float 20s infinite ease-in-out alternate;
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+.orb-1 { width: 60vw; height: 60vw; top: -20%; left: -10%; animation: float 25s infinite ease-in-out alternate, colorCycle1 20s infinite alternate; }
+.orb-2 { width: 50vw; height: 50vw; bottom: -10%; right: -10%; animation: float 30s infinite ease-in-out alternate, colorCycle2 25s infinite alternate; animation-delay: -5s; }
+.orb-3 { width: 40vw; height: 40vw; top: 30%; right: 20%; animation: float 22s infinite ease-in-out alternate, colorCycle3 30s infinite alternate; animation-delay: -10s; }
+.orb-4 { width: 30vw; height: 30vw; background: rgba(255,255,255,0.05); bottom: 20%; left: 20%; animation-duration: 28s; filter: blur(100px); }
+
+@keyframes colorCycle1 { 0% { background: #d32f2f; } 33% { background: #fbc02d; } 66% { background: #f57c00; } 100% { background: #d32f2f; } }
+@keyframes colorCycle2 { 0% { background: #fbc02d; } 33% { background: #d32f2f; } 66% { background: #c2185b; } 100% { background: #fbc02d; } }
+@keyframes colorCycle3 { 0% { background: #c2185b; } 33% { background: #f57c00; } 66% { background: #7b1fa2; } 100% { background: #c2185b; } }
+
+.ambient-particle {
+    position: absolute;
+    color: rgba(255,255,255,0.03);
+    font-size: 8rem;
+    font-weight: 700;
+    letter-spacing: -2px;
+    white-space: nowrap;
+    animation: drift 40s infinite linear;
+    z-index: 1;
+    pointer-events: none;
+    filter: blur(4px);
+}
+
+.particle-1 { top: 10%; left: -10%; animation-duration: 60s; }
+.particle-2 { top: 50%; right: -20%; animation-direction: reverse; animation-duration: 70s; font-size: 6rem; }
+.particle-3 { bottom: 10%; left: 20%; animation-duration: 80s; font-size: 10rem; }
+
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes drift {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(100vw); }
+}
+
+/* Glassmorphism Container */
 .auth-container {
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
     padding: 20px;
+    position: relative;
+    z-index: 10; /* Above ambient background */
 }
 
-.auth-box {
-    background-color: var(--card-bg);
-    padding: 40px 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 40px 35px;
+    box-shadow: var(--glass-shadow);
     text-align: center;
+    will-change: transform;
+    transform: translateZ(0);
 }
 
-.auth-box h2 {
-    margin-top: 0;
-    margin-bottom: 5px;
-    color: var(--text-color);
-}
-
-.subtitle {
-    color: #7f8c8d;
+.auth-logo {
     font-size: 14px;
-    margin-bottom: 25px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--fintech-teal);
+    margin-bottom: 20px;
+}
+
+.glass-panel h2 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+.glass-panel .subtitle {
+    color: var(--text-secondary);
+    font-size: 15px;
+    margin-bottom: 30px;
+    font-weight: 400;
+}
+
+/* Premium Inputs */
+.glass-panel .input-group input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 15px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.glass-panel .input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.glass-panel .input-group input:focus {
+    outline: none;
+    border-color: var(--fintech-teal);
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 0 4px rgba(140, 28, 78, 0.15);
+}
+
+/* Premium Button */
+.premium-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--fintech-teal), var(--fintech-emerald));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(140, 28, 78, 0.4);
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.premium-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(140, 28, 78, 0.6);
+    filter: brightness(1.1);
+}
+
+.premium-btn:active {
+    transform: translateY(1px);
 }
 
 .toggle-text {
-    margin-top: 20px;
+    margin-top: 25px;
     font-size: 14px;
-    color: var(--text-color);
+    color: var(--text-secondary);
 }
 
 .toggle-link {
-    color: var(--accent-color);
-    font-weight: bold;
+    color: var(--text-primary);
+    font-weight: 500;
     cursor: pointer;
     text-decoration: none;
+    transition: color 0.3s ease;
+    margin-left: 5px;
 }
 
 .toggle-link:hover {
-    text-decoration: underline;
+    color: var(--fintech-teal);
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS
+   ========================================= */
+
+.mobile-navbar {
+    display: none;
+}
+
+.mobile-only-btn {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .dashboard-body {
+        flex-direction: column;
+    }
+    
+    .mobile-navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        margin-bottom: 20px;
+        border-radius: 0 0 20px 20px;
+    }
+
+    .mobile-logo {
+        font-weight: bold;
+        font-size: 1.2rem;
+        color: var(--text-primary);
+    }
+
+    .hamburger-btn {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 1.8rem;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    /* Sidebar Mobile Overrides */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 250px;
+        height: 100vh;
+        z-index: 1001;
+        transition: right 0.3s ease;
+        margin: 0;
+        border-radius: 20px 0 0 20px;
+    }
+
+    .sidebar.show-sidebar {
+        right: 0;
+    }
+
+    /* Hide AI Advisor on mobile */
+    .ai-card {
+        display: none !important;
+    }
+
+    /* Adjust Main Content & Tables */
+    .main-content {
+        padding: 10px;
+    }
+
+    .expense-history, .expense-table {
+        width: 100%;
+        overflow-x: auto;
+    }
+    
+    .expense-table th, .expense-table td {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .balance-card {
+        max-width: 100%;
+    }
+
+    .mobile-only-btn {
+        display: block;
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 350px;
+        z-index: 999;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
 }

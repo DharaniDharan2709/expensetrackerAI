@@ -26,7 +26,7 @@ function getAutoDate() {
 // ==========================================
 async function loadExpenses() {
     try {
-        const response = await fetch('/get-expenses', {
+        const response = await fetch('http://127.0.0.1:5000/get-expenses', {
             method: 'GET',
             credentials: 'include' // Shows the login cookie!
         });
@@ -37,7 +37,7 @@ async function loadExpenses() {
             updateUI(); 
         } else {
             // If not logged in, kick them to the login page
-            window.location.href = "index.html";
+            window.location.href = "auth.html";
         }
     } catch (err) {
         console.error("Server not running.");
@@ -60,7 +60,7 @@ updateBtn.addEventListener('click', async () => {
 
     try {
         // Send to Python Database
-        const response = await fetch('/save-expense', {
+        const response = await fetch('http://127.0.0.1:5000/save-expense', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include', // Shows the login cookie!
@@ -86,31 +86,44 @@ function updateUI() {
     balanceText.innerText = "₹" + balance.toFixed(2);
     balanceText.style.color = balance < 0 ? "#e74c3c" : "#2ecc71";
 
-    expenseList.innerHTML = '';
-    fullTransactionList.innerHTML = '';
+    const dashHead = document.querySelector('.expense-history thead');
+    const transHead = document.querySelector('.transaction-table-wrapper thead');
 
-    expenses.forEach((exp, index) => {
-        let rowHtml = `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${exp.name}</td>
-                <td style="font-weight:bold;">₹${exp.amount.toFixed(2)}</td>
-                <td><button class="delete-btn" onclick="deleteExpense(${exp.id})">🗑️ Delete</button></td>
-            </tr>
-        `;
-        expenseList.innerHTML += rowHtml;
+    if (expenses.length === 0) {
+        if(dashHead) dashHead.style.display = 'none';
+        if(transHead) transHead.style.display = 'none';
+        expenseList.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 30px; color: var(--text-secondary); font-size: 16px;">No expense entered</td></tr>';
+        fullTransactionList.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 30px; color: var(--text-secondary); font-size: 16px;">No expense entered</td></tr>';
+    } else {
+        if(dashHead) dashHead.style.display = '';
+        if(transHead) transHead.style.display = '';
+        
+        expenseList.innerHTML = '';
+        fullTransactionList.innerHTML = '';
 
-        fullTransactionList.innerHTML += `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${exp.date}</td>
-                <td>${exp.name}</td>
-                <td>---</td>
-                <td style="font-weight:bold;">₹${exp.amount.toFixed(2)}</td>
-                <td><button class="delete-btn" onclick="deleteExpense(${exp.id})">🗑️ Delete</button></td>
-            </tr>
-        `;
-    });
+        expenses.forEach((exp, index) => {
+            let rowHtml = `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${exp.name}</td>
+                    <td style="font-weight:bold;">₹${exp.amount.toFixed(2)}</td>
+                    <td></td>
+                </tr>
+            `;
+            expenseList.innerHTML += rowHtml;
+
+            fullTransactionList.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${exp.date}</td>
+                    <td>${exp.name}</td>
+                    <td>---</td>
+                    <td style="font-weight:bold;">₹${exp.amount.toFixed(2)}</td>
+                    <td></td>
+                </tr>
+            `;
+        });
+    }
 
     if (budget == 0) {
         aiAdviceText.innerText = "👋 Hello! Set a budget to get started.";
@@ -123,28 +136,6 @@ function updateUI() {
     }
 }
 
-// ==========================================
-// 4. DELETE EXPENSE FROM DATABASE
-// ==========================================
-async function deleteExpense(id) {
-    if(!confirm("Are you sure you want to delete this expense?")) return;
-
-    try {
-        const response = await fetch(`/delete-expense/${id}`, {
-            method: 'DELETE',
-            credentials: 'include'
-        });
-
-        if (response.ok) {
-            await loadExpenses(); // Refresh list
-        } else {
-            alert("Could not delete expense.");
-        }
-    } catch (e) {
-        alert("Server error.");
-    }
-}
-
 budgetInput.addEventListener('input', (e) => {
     budget = parseFloat(e.target.value) || 0;
     localStorage.setItem('userBudget', budget);
@@ -154,12 +145,8 @@ budgetInput.addEventListener('input', (e) => {
 // ==========================================
 // 4. POPUPS (MODALS) & SIDEBAR
 // ==========================================
-const settingsModal = document.getElementById('settings-modal');
 const transactionsModal = document.getElementById('transactions-modal');
 const aiModal = document.getElementById('ai-chat-modal');
-
-document.getElementById('open-settings').onclick = () => settingsModal.style.display = 'flex';
-document.getElementById('close-settings').onclick = () => settingsModal.style.display = 'none';
 
 document.getElementById('open-transactions').onclick = () => transactionsModal.style.display = 'flex';
 document.getElementById('close-transactions').onclick = () => transactionsModal.style.display = 'none';
@@ -167,23 +154,9 @@ document.getElementById('close-transactions').onclick = () => transactionsModal.
 document.getElementById('open-ai-chat').onclick = () => aiModal.style.display = 'flex';
 document.getElementById('close-ai-chat').onclick = () => aiModal.style.display = 'none';
 
-const darkModeBtn = document.getElementById('dark-mode-toggle');
-darkModeBtn.onclick = () => {
-    document.body.classList.toggle('dark-mode');
-    darkModeBtn.innerText = document.body.classList.contains('dark-mode') ? "☀️ Disable" : "🌙 Enable";
-};
+const mobileAiBtn = document.getElementById('mobile-floating-ai-btn');
+if(mobileAiBtn) mobileAiBtn.onclick = () => aiModal.style.display = 'flex';
 
-document.getElementById('logout-link').onclick = async () => {
-    try {
-        await fetch('/logout', {
-            method: 'GET',
-            credentials: 'include'
-        });
-    } catch (e) {
-        console.error("Logout failed at server, but redirecting anyway.");
-    }
-    window.location.href = "index.html";
-};
 
 // ==========================================
 // 5. GROQ AI INTEGRATION (FIXED 401 ERROR)
@@ -198,7 +171,7 @@ runAnalysisBtn.addEventListener('click', async () => {
     try {
         // Notice we added credentials: 'include' so Python knows who is logged in!
         // We also stopped sending the array, because Python checks the database directly now.
-        const response = await fetch('/analyze', {
+        const response = await fetch('http://127.0.0.1:5000/analyze', {
             method: 'POST',
             credentials: 'include' 
         });
@@ -216,3 +189,23 @@ runAnalysisBtn.addEventListener('click', async () => {
     
     runAnalysisBtn.disabled = false;
 });
+
+// ==========================================
+// 6. MOBILE RESPONSIVENESS
+// ==========================================
+const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+const sidebar = document.getElementById('sidebar');
+
+if (mobileMenuBtn && sidebar) {
+    mobileMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar.classList.toggle('show-sidebar');
+    });
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('show-sidebar') && !sidebar.contains(e.target)) {
+            sidebar.classList.remove('show-sidebar');
+        }
+    });
+}

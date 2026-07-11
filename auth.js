@@ -8,14 +8,30 @@ const showLoginBtn = document.getElementById('show-login');
 
 // Switch to Registration View
 showRegisterBtn.addEventListener('click', () => {
-    loginPanel.style.display = 'none';
-    registerPanel.style.display = 'block';
+    loginPanel.style.opacity = '0';
+    loginPanel.style.transform = 'translateY(-20px)';
+    setTimeout(() => {
+        loginPanel.style.display = 'none';
+        registerPanel.style.display = 'block';
+        setTimeout(() => {
+            registerPanel.style.opacity = '1';
+            registerPanel.style.transform = 'translateY(0)';
+        }, 50);
+    }, 400);
 });
 
 // Switch back to Login View
 showLoginBtn.addEventListener('click', () => {
-    registerPanel.style.display = 'none';
-    loginPanel.style.display = 'block';
+    registerPanel.style.opacity = '0';
+    registerPanel.style.transform = 'translateY(-20px)';
+    setTimeout(() => {
+        registerPanel.style.display = 'none';
+        loginPanel.style.display = 'block';
+        setTimeout(() => {
+            loginPanel.style.opacity = '1';
+            loginPanel.style.transform = 'translateY(0)';
+        }, 50);
+    }, 400);
 });
 
 // Real Login Button Click

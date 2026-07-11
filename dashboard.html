@@ -3,19 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Manager - Dashboard</title>
+    <title>Expense Manager AI - Dashboard</title>
+    
+    <!-- Premium Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="dashboard-body">
 
+    <!-- Apple Music Lyric Style Ambient Background -->
+    <div class="ambient-background">
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+        <div class="ambient-orb orb-3"></div>
+        <div class="ambient-orb orb-4"></div>
+        <div class="ambient-particle particle-1">Health</div>
+        <div class="ambient-particle particle-2">AI Insights</div>
+        <div class="ambient-particle particle-3">Budget</div>
+    </div>
+
+    <!-- Mobile Navigation Bar (Hidden on Desktop) -->
+    <nav class="mobile-navbar glass-panel">
+        <div class="mobile-logo">Expense Tracker</div>
+        <button id="mobile-menu-btn" class="hamburger-btn">☰</button>
+    </nav>
+
     <!-- 1. The Left Sidebar Navigation -->
-    <div class="sidebar">
+    <div id="sidebar" class="sidebar glass-panel">
         <h2>Expense Manager</h2>
         <a href="#" class="active">Dashboard</a>
         <a href="#" id="open-transactions">Transactions</a>
-        <a href="#" id="open-settings">Settings</a>
-        <a href="#" id="open-ai-chat" style="color: #a8e6cf; font-weight: bold;">✨ Analyse with AI</a>
-        <a href="#" id="logout-link" class="logout">Logout</a>
+        <a href="#" id="open-ai-chat" style="color: var(--fintech-gold); font-weight: bold;">✨ Analyse with AI</a>
+        <a href="#" id="logout-link" class="premium-btn" style="margin-top: auto; align-self: center; width: 80%; text-align: center; padding: 10px; font-size: 14px; border-radius: 8px;">Logout</a>
     </div>
 
     <!-- 2. The Main Content Area -->
@@ -31,12 +53,12 @@
         <!-- 3. Balance & AI Advisor Area -->
         <div class="balance-wrapper" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 50px;">
             
-            <div class="card balance-card">
+            <div class="card balance-card glass-panel">
                 <h3>Balance Amount</h3>
                 <p>₹0.00</p> 
             </div>
 
-            <div class="card ai-card">
+            <div class="card ai-card glass-panel">
                 <h3>🤖 AI Advisor</h3>
                 <p id="ai-advice-text">👋 Hello! Set a budget to get personalized financial advice.</p>
             </div>
@@ -46,21 +68,21 @@
         <!-- 4. Enter Expense Section -->
         <div class="expense-section">
             <h2>Enter Expense</h2>
-            <div class="expense-box">
+            <div class="expense-box glass-panel">
                 <div class="input-group">
                     <input type="text" id="expense-name" placeholder="Name of the expense" required>
                 </div>
                 <div class="input-group">
                     <input type="number" id="expense-amount" placeholder="Enter money spent" required>
                 </div>
-                <button type="button" id="update-btn" class="login-btn">Update</button>
+                <button type="button" id="update-btn" class="login-btn premium-btn">Update</button>
             </div>
         </div>
 
         <!-- 5. Dashboard Mini-Table -->
         <div class="expense-history">
             <h2>Expense History</h2>
-            <table class="expense-table">
+            <table class="expense-table glass-panel">
                 <thead>
                     <tr>
                         <th>S.No</th>
@@ -74,21 +96,11 @@
         </div>
     </div>
 
-    <!-- 6. The Settings Popup (Modal) -->
-    <div id="settings-modal" class="modal-overlay">
-        <div class="modal-box">
-            <span id="close-settings" class="close-btn">&times;</span>
-            <h2>Settings</h2>
-            <div class="setting-option">
-                <p>Appearance: Dark Theme</p>
-                <button id="dark-mode-toggle" class="login-btn" style="width: auto; padding: 10px 20px;">🌙 Enable</button>
-            </div>
-        </div>
-    </div>
+
 
     <!-- 7. Transactions Popup (Modal) -->
     <div id="transactions-modal" class="modal-overlay">
-        <div class="modal-box" style="max-width: 90%; width: 1000px;">
+        <div class="modal-box glass-panel" style="max-width: 90%; width: 1000px;">
             <span id="close-transactions" class="close-btn">&times;</span>
             <h2>Detailed Transaction History</h2>
             
@@ -114,21 +126,24 @@
     
     <!-- 8. The AI Chat Modal -->
     <div id="ai-chat-modal" class="modal-overlay">
-        <div class="modal-box" style="max-width: 600px; height: 80vh; display: flex; flex-direction: column;">
+        <div class="modal-box glass-panel" style="max-width: 600px; height: 80vh; display: flex; flex-direction: column;">
             <span id="close-ai-chat" class="close-btn">&times;</span>
             <h2 style="color: #3498db;">🤖 AI Financial Analyst</h2>
             
             <!-- Where the chat text will appear -->
-            <div id="chat-window" style="flex: 1; overflow-y: auto; background: #f9fbfd; border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 20px; border: 1px solid #ccd1d9; white-space: pre-wrap;">
+            <div id="chat-window" class="glass-panel" style="flex: 1; overflow-y: auto; text-align: left; margin-bottom: 20px; white-space: pre-wrap; color: var(--text-primary); border-radius: 12px; padding: 20px;">
                 Hello! I am your AI Financial Advisor. Click the button below to send me your current expense sheet, and I will give you a full analysis!
             </div>
 
             <!-- The trigger button -->
-            <button id="run-analysis-btn" class="login-btn" style="background-color: #27ae60;">📊 Analyze My Expenses Now</button>
+            <button id="run-analysis-btn" class="login-btn premium-btn" style="background-color: #27ae60;">📊 Analyze My Expenses Now</button>
         </div>
     </div>
 
     <!-- Link the Javascript at the very end -->
+    <!-- Floating Mobile AI Button -->
+    <button id="mobile-floating-ai-btn" class="premium-btn mobile-only-btn">✨ Analyse with AI</button>
+
     <script src="script.js"></script>
 </body>
 </html>

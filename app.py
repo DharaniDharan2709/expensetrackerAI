@@ -1,29 +1,23 @@
 import os
-from flask import Flask, request, jsonify, session, send_from_directory
+from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from openai import OpenAI
-from dotenv import load_dotenv
 
-# Load variables from .env file
-load_dotenv()
-
-app = Flask(__name__, static_url_path='', static_folder='.')
+app = Flask(__name__)
 
 # ==========================================
 # 1. NEW: SECURITY & DATABASE CONFIGURATION
 # ==========================================
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default_secret_key')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///database.db')
-
-# FIX: Render/Postgres strings often start with 'postgres://', but SQLAlchemy needs 'postgresql://'
-if app.config['SQLALCHEMY_DATABASE_URI'].startswith("postgres://"):
-    app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace("postgres://", "postgresql://", 1)
-
+# Required for secure login sessions
+app.config['SECRET_KEY'] = 'dharani_secret_key_2026'
+# Tells Python to create a 'database.db' file in your folder
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# CRITICAL: supports_credentials=True allows the browser to remember you are logged in
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
 db = SQLAlchemy(app)
@@ -32,7 +26,8 @@ login_manager = LoginManager(app)
 # ==========================================
 # 2. YOUR GROQ SETUP
 # ==========================================
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# Paste your NEW Groq API key inside the quotes
+GROQ_API_KEY = "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"
 
 client = OpenAI(
     api_key=GROQ_API_KEY,
@@ -47,7 +42,6 @@ class User(UserMixin, db.Model):
     fullname = db.Column(db.String(100))
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
     expenses = db.relationship('Expense', backref='owner', lazy=True)
 
 class Expense(db.Model):
@@ -64,84 +58,33 @@ def load_user(user_id):
 # Generate the database file when the app starts
 with app.app_context():
     db.create_all()
-    # AUTOMATIC MIGRATION: Try to add is_admin column if it doesn't exist
-    try:
-        from sqlalchemy import text
-        db.session.execute(text('ALTER TABLE "user" ADD COLUMN is_admin BOOLEAN DEFAULT FALSE'))
-        db.session.commit()
-    except Exception:
-        db.session.rollback() # Column likely already exists
 
 # ==========================================
-# 4. FRONTEND ROUTES (For Hosting)
-# ==========================================
-@app.route('/')
-def serve_index():
-    return send_from_directory('.', 'index.html')
-
-@app.route('/auth.html')
-def serve_auth():
-    return send_from_directory('.', 'auth.html')
-
-@app.route('/dashboard.html')
-def serve_dashboard():
-    return send_from_directory('.', 'dashboard.html')
-
-@app.route('/admin.html')
-@login_required
-def serve_admin():
-    if not current_user.is_admin:
-        return "Access Denied", 403
-    return send_from_directory('.', 'admin.html')
-
-@app.route('/<path:path>')
-def serve_static(path):
-    return send_from_directory('.', path)
-
-# ==========================================
-# 5. NEW: AUTHENTICATION ROUTES
+# 4. NEW: AUTHENTICATION ROUTES
 # ==========================================
 @app.route('/register', methods=['POST'])
 def register():
-    try:
-        data = request.json
-        if User.query.filter_by(email=data['email']).first():
-            return jsonify({"message": "Email already exists!"}), 400
-        
-        hashed_pw = generate_password_hash(data['password'], method='pbkdf2:sha256')
-        new_user = User(fullname=data['fullname'], email=data['email'], password=hashed_pw)
-        
-        db.session.add(new_user)
-        db.session.commit()
-        return jsonify({"message": "Account created successfully!"})
-    except Exception as e:
-        print(f"Registration error: {e}")
-        return jsonify({"message": "Internal server error during registration"}), 500
+    data = request.json
+    if User.query.filter_by(email=data['email']).first():
+        return jsonify({"message": "Email already exists!"}), 400
+    
+    hashed_pw = generate_password_hash(data['password'], method='pbkdf2:sha256')
+    new_user = User(fullname=data['fullname'], email=data['email'], password=hashed_pw)
+    
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"message": "Account created successfully!"})
 
 @app.route('/login', methods=['POST'])
 def login():
-    try:
-        data = request.json
-        user = User.query.filter_by(email=data['email']).first()
-        
-        if user and check_password_hash(user.password, data['password']):
-            # --- AUTO-ADMIN LOGIC ---
-            # Automatically promotes this specific email to Admin
-            if user.email == 'indoorgaming22@gmail.com' and not user.is_admin:
-                user.is_admin = True
-                db.session.commit()
-                print(f"✅ Promoted {user.email} to Admin automatically.")
-
-            login_user(user)
-            return jsonify({
-                "message": "Login successful!",
-                "is_admin": bool(user.is_admin) # Ensure it's a clear boolean
-            })
-        
-        return jsonify({"message": "Invalid email or password"}), 401
-    except Exception as e:
-        print(f"Login error: {e}")
-        return jsonify({"message": "Internal server error during login"}), 500
+    data = request.json
+    user = User.query.filter_by(email=data['email']).first()
+    
+    if user and check_password_hash(user.password, data['password']):
+        login_user(user)
+        return jsonify({"message": "Login successful!"})
+    
+    return jsonify({"message": "Invalid email or password"}), 401
 
 @app.route('/logout')
 @login_required
@@ -150,30 +93,7 @@ def logout():
     return jsonify({"message": "Logged out!"})
 
 # ==========================================
-# 6. ADMIN ROUTES
-# ==========================================
-@app.route('/admin/users', methods=['GET'])
-@login_required
-def get_all_users():
-    if not current_user.is_admin:
-        return jsonify({"message": "Unauthorized"}), 403
-    
-    users = User.query.filter_by(is_admin=False).all()
-    output = [{"id": u.id, "fullname": u.fullname, "email": u.email} for u in users]
-    return jsonify({"users": output})
-
-@app.route('/admin/user/<int:user_id>/expenses', methods=['GET'])
-@login_required
-def get_user_expenses_admin(user_id):
-    if not current_user.is_admin:
-        return jsonify({"message": "Unauthorized"}), 403
-    
-    user_expenses = Expense.query.filter_by(user_id=user_id).all()
-    output = [{"id": exp.id, "name": exp.name, "amount": exp.amount, "date": exp.date} for exp in user_expenses]
-    return jsonify({"expenses": output})
-
-# ==========================================
-# 7. NEW: DATABASE EXPENSE ROUTES
+# 5. NEW: DATABASE EXPENSE ROUTES
 # ==========================================
 @app.route('/save-expense', methods=['POST'])
 @login_required
@@ -196,23 +116,13 @@ def get_expenses():
     output = [{"id": exp.id, "name": exp.name, "amount": exp.amount, "date": exp.date} for exp in user_expenses]
     return jsonify({"expenses": output})
 
-@app.route('/delete-expense/<int:expense_id>', methods=['DELETE'])
-@login_required
-def delete_expense(expense_id):
-    expense = Expense.query.filter_by(id=expense_id, user_id=current_user.id).first()
-    if not expense:
-        return jsonify({"message": "Expense not found"}), 404
-    
-    db.session.delete(expense)
-    db.session.commit()
-    return jsonify({"message": "Expense deleted!"})
-
 # ==========================================
 # 6. YOUR MODIFIED AI ROUTE
 # ==========================================
 @app.route('/analyze', methods=['POST'])
-@login_required
+@login_required # Makes sure only logged-in users can use the AI
 def analyze_expenses():
+    # Now it pulls directly from your permanent database!
     user_expenses = Expense.query.filter_by(user_id=current_user.id).all()
 
     if not user_expenses:
@@ -221,13 +131,40 @@ def analyze_expenses():
     expense_list_text = "\n".join([f"- {exp.date}: {exp.name} (₹{exp.amount})" for exp in user_expenses])
 
     prompt = f"""
-    You are an expert, witty financial advisor. 
-    Analyze these expenses:
-    {expense_list_text}
-    
-    Provide a brief, insightful analysis. Mention the highest expense, 
-    one saving tip, and an encouraging closing statement. 
-    Use emojis and clear formatting.
+    You are an expert, witty financial advisor.
+
+Analyze the following expense data:
+{expense_list_text}
+
+Provide a brief and insightful financial analysis.
+
+Requirements:
+- Identify the HIGHEST EXPENSE category and amount.
+- List the top spending categories in descending order.
+- Use CAPITAL LETTERS for expense category names.
+- Give 2-3 practical savings tips based on the user's spending habits.
+- Suggest where the user can reduce spending.
+- Keep the advice realistic and actionable.
+- End with a positive and encouraging financial statement.
+- Use emojis and clear formatting.
+- Keep the response concise and easy to read.
+
+Format the response like:
+
+📊 EXPENSE ANALYSIS
+
+1. CATEGORY NAME — Amount
+2. CATEGORY NAME — Amount
+
+🔥 HIGHEST EXPENSE:
+Category — Amount
+
+💡 SAVING TIPS:
+• Tip 1
+• Tip 2
+• Tip 3
+
+🚀 Keep going! [encouraging closing statement]
     """
     
     try:
@@ -242,7 +179,7 @@ def analyze_expenses():
         
     except Exception as e:
         print(f"❌ GROQ ERROR: {e}") 
-        return jsonify({"reply": "Groq had a hiccup!"})
+        return jsonify({"reply": "Groq had a hiccup! Check your terminal."})
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
