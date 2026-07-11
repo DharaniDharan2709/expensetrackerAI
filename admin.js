@@ -1,3 +1,5 @@
+const API_BASE_URL = 'https://DharaniGUs.pythonanywhere.com'; // CHANGE THIS TO YOUR PYTHONANYWHERE URL BEFORE DEPLOYING
+
 const userList = document.getElementById('user-list');
 const expenseList = document.getElementById('admin-expense-list');
 const selectedName = document.getElementById('selected-user-name');
@@ -8,7 +10,7 @@ const selectedEmail = document.getElementById('selected-user-email');
 // ==========================================
 async function loadUsers() {
     try {
-        const response = await fetch('/admin/users', { credentials: 'include' });
+        const response = await fetch(`${API_BASE_URL}/admin/users`, { credentials: 'include' });
         if (response.ok) {
             const data = await response.json();
             renderUserList(data.users);
@@ -59,7 +61,7 @@ async function viewUserExpenses(user) {
     expenseList.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading expenses...</td></tr>';
 
     try {
-        const response = await fetch(`/admin/user/${user.id}/expenses`, { credentials: 'include' });
+        const response = await fetch(`${API_BASE_URL}/admin/user/${user.id}/expenses`, { credentials: 'include' });
         if (response.ok) {
             const data = await response.json();
             renderExpenses(data.expenses);
@@ -93,7 +95,7 @@ function renderExpenses(expenses) {
 // ==========================================
 document.getElementById('admin-logout').onclick = async () => {
     try {
-        await fetch('/logout', { credentials: 'include' });
+        await fetch(`${API_BASE_URL}/logout`, { credentials: 'include' });
     } catch (e) {}
     window.location.href = "index.html";
 };

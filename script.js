@@ -1,3 +1,5 @@
+const API_BASE_URL = 'http://127.0.0.1:5000'; // CHANGE THIS TO YOUR PYTHONANYWHERE URL BEFORE DEPLOYING
+
 // ==========================================
 // 1. GRAB ELEMENTS FROM YOUR HTML
 // ==========================================
@@ -26,7 +28,7 @@ function getAutoDate() {
 // ==========================================
 async function loadExpenses() {
     try {
-        const response = await fetch('http://127.0.0.1:5000/get-expenses', {
+        const response = await fetch(`${API_BASE_URL}/get-expenses`, {
             method: 'GET',
             credentials: 'include' // Shows the login cookie!
         });
@@ -60,7 +62,7 @@ updateBtn.addEventListener('click', async () => {
 
     try {
         // Send to Python Database
-        const response = await fetch('http://127.0.0.1:5000/save-expense', {
+        const response = await fetch(`${API_BASE_URL}/save-expense`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include', // Shows the login cookie!
@@ -171,7 +173,7 @@ runAnalysisBtn.addEventListener('click', async () => {
     try {
         // Notice we added credentials: 'include' so Python knows who is logged in!
         // We also stopped sending the array, because Python checks the database directly now.
-        const response = await fetch('http://127.0.0.1:5000/analyze', {
+        const response = await fetch(`${API_BASE_URL}/analyze`, {
             method: 'POST',
             credentials: 'include' 
         });

@@ -1,3 +1,5 @@
+const API_BASE_URL = 'http://127.0.0.1:5000'; // CHANGE THIS TO YOUR PYTHONANYWHERE URL BEFORE DEPLOYING
+
 // Grab the panels
 const loginPanel = document.getElementById('login-panel');
 const registerPanel = document.getElementById('register-panel');
@@ -42,7 +44,7 @@ document.getElementById('login-submit').addEventListener('click', async () => {
     if(!email || !password) return alert("Please enter both email and password.");
 
     try {
-        const response = await fetch('/login', {
+        const response = await fetch(`${API_BASE_URL}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -78,7 +80,7 @@ document.getElementById('register-submit').addEventListener('click', async () =>
     if(!fullname || !email || !password) return alert("Please fill out all registration fields.");
 
     try {
-        const response = await fetch('/register', {
+        const response = await fetch(`${API_BASE_URL}/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ fullname, email, password })

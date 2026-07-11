@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -18,7 +19,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # CRITICAL: supports_credentials=True allows the browser to remember you are logged in
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
+load_dotenv()
+frontend_url = os.environ.get('FRONTEND_URL', 'http://127.0.0.1:5500')
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": [frontend_url, "http://localhost:5500", "http://127.0.0.1:5000", "http://localhost:5000"]}})
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
