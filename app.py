@@ -116,6 +116,16 @@ def get_expenses():
     output = [{"id": exp.id, "name": exp.name, "amount": exp.amount, "date": exp.date} for exp in user_expenses]
     return jsonify({"expenses": output})
 
+@app.route('/delete-expense/<int:expense_id>', methods=['DELETE'])
+@login_required
+def delete_expense(expense_id):
+    expense = Expense.query.get(expense_id)
+    if not expense or expense.user_id != current_user.id:
+        return jsonify({"message": "Expense not found"}), 404
+    db.session.delete(expense)
+    db.session.commit()
+    return jsonify({"message": "Expense deleted!"})
+
 # ==========================================
 # 6. YOUR MODIFIED AI ROUTE
 # ==========================================

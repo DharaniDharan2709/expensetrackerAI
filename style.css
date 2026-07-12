@@ -389,6 +389,24 @@ body {
 }
 
 
+/* Delete Button */
+.delete-btn {
+    background: rgba(231, 76, 60, 0.2);
+    border: 1px solid rgba(231, 76, 60, 0.4);
+    color: #e74c3c;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+    background: rgba(231, 76, 60, 0.5);
+    color: white;
+    transform: scale(1.1);
+}
+
  /* =========================================
    PREMIUM FINTECH LOGIN STYLES (APPLE MUSIC INSPIRED)
 ========================================= */

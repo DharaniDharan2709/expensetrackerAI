@@ -82,6 +82,26 @@ updateBtn.addEventListener('click', async () => {
     updateBtn.innerText = "Update";
 });
 
+// ==========================================
+// 3b. DELETE EXPENSE FROM DATABASE
+// ==========================================
+async function deleteExpense(id) {
+    if (!confirm('Are you sure you want to delete this expense?')) return;
+    try {
+        const response = await fetch(`${API_BASE_URL}/delete-expense/${id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        if (response.ok) {
+            await loadExpenses();
+        } else {
+            alert('Failed to delete expense.');
+        }
+    } catch(e) {
+        alert('Server error.');
+    }
+}
+
 function updateUI() {
     let totalSpent = expenses.reduce((sum, exp) => sum + exp.amount, 0);
     let balance = budget - totalSpent;
@@ -109,7 +129,7 @@ function updateUI() {
                     <td>${index + 1}</td>
                     <td>${exp.name}</td>
                     <td style="font-weight:bold;">₹${exp.amount.toFixed(2)}</td>
-                    <td></td>
+                    <td><button class="delete-btn" onclick="deleteExpense(${exp.id})">🗑️</button></td>
                 </tr>
             `;
             expenseList.innerHTML += rowHtml;
@@ -121,7 +141,7 @@ function updateUI() {
                     <td>${exp.name}</td>
                     <td>---</td>
                     <td style="font-weight:bold;">₹${exp.amount.toFixed(2)}</td>
-                    <td></td>
+                    <td><button class="delete-btn" onclick="deleteExpense(${exp.id})">🗑️</button></td>
                 </tr>
             `;
         });
