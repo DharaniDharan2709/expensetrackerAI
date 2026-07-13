@@ -109,7 +109,7 @@ function updateUI() {
                     <td>${index + 1}</td>
                     <td>${exp.name}</td>
                     <td style="font-weight:bold;">₹${exp.amount.toFixed(2)}</td>
-                    <td></td>
+                    <td><button class="delete-btn" onclick="deleteExpense(${exp.id})">Delete</button></td>
                 </tr>
             `;
             expenseList.innerHTML += rowHtml;
@@ -121,7 +121,7 @@ function updateUI() {
                     <td>${exp.name}</td>
                     <td>---</td>
                     <td style="font-weight:bold;">₹${exp.amount.toFixed(2)}</td>
-                    <td></td>
+                    <td><button class="delete-btn" onclick="deleteExpense(${exp.id})">Delete</button></td>
                 </tr>
             `;
         });
@@ -210,4 +210,44 @@ if (mobileMenuBtn && sidebar) {
             sidebar.classList.remove('show-sidebar');
         }
     });
+}
+// ==========================================
+// LOGOUT FUNCTIONALITY
+// ==========================================
+const logoutLink = document.getElementById('logout-link');
+if (logoutLink) {
+    logoutLink.addEventListener('click', async (e) => {
+        e.preventDefault(); // Stop the link from jumping to the top of the page
+        try {
+            await fetch(`${API_BASE_URL}/logout`, { 
+                method: 'GET',
+                credentials: 'include' 
+            });
+        } catch (err) {
+            console.error("Logout failed", err);
+        }
+        window.location.href = "index.html"; // Send back to login
+    });
+}
+// ==========================================
+// DELETE EXPENSE FUNCTION
+// ==========================================
+async function deleteExpense(expenseId) {
+    if (!confirm("Are you sure you want to delete this expense?")) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/delete-expense/${expenseId}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            // Re-fetch the updated list from the database and redraw the UI
+            await loadExpenses(); 
+        } else {
+            alert("Failed to delete expense. Session might have expired.");
+        }
+    } catch (e) {
+        alert("Server error while deleting.");
+    }
 }
