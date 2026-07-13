@@ -1,9 +1,8 @@
-const API_BASE_URL = ''; // Leave empty for Render deployment (Flask serves everything)
+const API_BASE_URL = 'https://DharaniGUs.pythonanywhere.com'; // CHANGE THIS TO YOUR PYTHONANYWHERE URL BEFORE DEPLOYING
 
 // Grab the panels
 const loginPanel = document.getElementById('login-panel');
 const registerPanel = document.getElementById('register-panel');
-
 // Grab the toggle links
 const showRegisterBtn = document.getElementById('show-register');
 const showLoginBtn = document.getElementById('show-login');
@@ -33,7 +32,7 @@ showLoginBtn.addEventListener('click', () => {
             loginPanel.style.opacity = '1';
             loginPanel.style.transform = 'translateY(0)';
         }, 50);
-    }, 400);
+}, 400);
 });
 
 // Real Login Button Click

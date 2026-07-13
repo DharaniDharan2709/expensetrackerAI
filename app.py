@@ -16,8 +16,16 @@ app = Flask(__name__, static_folder='.', static_url_path='')
 # 1. SECURITY & DATABASE CONFIGURATION
 # ==========================================
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dharani_secret_key_2026')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+
+# Database Configuration
+# Neon gives 'postgres://' but SQLAlchemy needs 'postgresql://'
+database_url = os.environ.get('DATABASE_URL', 'sqlite:///database.db')
+if database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_pre_ping": True}
 
 CORS(app, supports_credentials=True)
 
