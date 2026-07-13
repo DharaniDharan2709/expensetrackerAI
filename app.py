@@ -208,7 +208,10 @@ def serve_index():
 
 @app.route('/<path:path>')
 def serve_static(path):
-    return send_from_directory('.', path)
+    # Only serve actual files, don't intercept API routes
+    if os.path.isfile(path):
+        return send_from_directory('.', path)
+    return jsonify({"message": "Not found"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
