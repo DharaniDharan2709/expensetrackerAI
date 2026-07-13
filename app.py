@@ -9,8 +9,11 @@ from openai import OpenAI
 
 load_dotenv()
 
-# Flask serves your HTML/CSS/JS files directly from this folder
-app = Flask(__name__, static_folder='.', static_url_path='')
+# Get the folder where app.py lives
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# DO NOT set static_folder to '.' — it hijacks API routes
+app = Flask(__name__)
 
 # ==========================================
 # 1. SECURITY & DATABASE CONFIGURATION
@@ -18,8 +21,8 @@ app = Flask(__name__, static_folder='.', static_url_path='')
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dharani_secret_key_2026')
 
 # Database Configuration
+database_url = os.environ.get('DATABASE_URL', f'sqlite:///{os.path.join(BASE_DIR, "instance", "database.db")}')
 # Neon gives 'postgres://' but SQLAlchemy needs 'postgresql://'
-database_url = os.environ.get('DATABASE_URL', 'sqlite:///database.db')
 if database_url.startswith('postgres://'):
     database_url = database_url.replace('postgres://', 'postgresql://', 1)
 
@@ -43,7 +46,7 @@ client = OpenAI(
 )
 
 # ==========================================
-# 3. NEW: DATABASE TABLES
+# 3. DATABASE TABLES
 # ==========================================
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -63,12 +66,30 @@ class Expense(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Generate the database file when the app starts
+# Generate tables when the app starts
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        print("Database tables created successfully!")
+    except Exception as e:
+        print(f"DATABASE ERROR: {e}")
 
 # ==========================================
-# 4. NEW: AUTHENTICATION ROUTES
+# 4. SERVE HTML/CSS/JS FILES
+# ==========================================
+@app.route('/')
+def serve_index():
+    return send_from_directory(BASE_DIR, 'index.html')
+
+@app.route('/<path:filename>')
+def serve_files(filename):
+    file_path = os.path.join(BASE_DIR, filename)
+    if os.path.isfile(file_path):
+        return send_from_directory(BASE_DIR, filename)
+    return jsonify({"message": "Not found"}), 404
+
+# ==========================================
+# 5. AUTHENTICATION ROUTES
 # ==========================================
 @app.route('/register', methods=['POST'])
 def register():
@@ -101,7 +122,7 @@ def logout():
     return jsonify({"message": "Logged out!"})
 
 # ==========================================
-# 5. NEW: DATABASE EXPENSE ROUTES
+# 6. DATABASE EXPENSE ROUTES
 # ==========================================
 @app.route('/save-expense', methods=['POST'])
 @login_required
@@ -135,18 +156,17 @@ def delete_expense(expense_id):
     return jsonify({"message": "Expense deleted!"})
 
 # ==========================================
-# 6. YOUR MODIFIED AI ROUTE
+# 7. AI ROUTE
 # ==========================================
 @app.route('/analyze', methods=['POST'])
-@login_required # Makes sure only logged-in users can use the AI
+@login_required
 def analyze_expenses():
-    # Now it pulls directly from your permanent database!
     user_expenses = Expense.query.filter_by(user_id=current_user.id).all()
 
     if not user_expenses:
         return jsonify({"reply": "I don't see any expenses yet! Add some to your dashboard so I can analyze them."})
 
-    expense_list_text = "\n".join([f"- {exp.date}: {exp.name} (₹{exp.amount})" for exp in user_expenses])
+    expense_list_text = "\n".join([f"- {exp.date}: {exp.name} (Rs.{exp.amount})" for exp in user_expenses])
 
     prompt = f"""
     You are an expert, witty financial advisor.
@@ -166,23 +186,6 @@ Requirements:
 - End with a positive and encouraging financial statement.
 - Use emojis and clear formatting.
 - Keep the response concise and easy to read.
-
-Format the response like:
-
-📊 EXPENSE ANALYSIS
-
-1. CATEGORY NAME — Amount
-2. CATEGORY NAME — Amount
-
-🔥 HIGHEST EXPENSE:
-Category — Amount
-
-💡 SAVING TIPS:
-• Tip 1
-• Tip 2
-• Tip 3
-
-🚀 Keep going! [encouraging closing statement]
     """
     
     try:
@@ -196,22 +199,8 @@ Category — Amount
         return jsonify({"reply": response.choices[0].message.content})
         
     except Exception as e:
-        print(f"❌ GROQ ERROR: {e}") 
+        print(f"GROQ ERROR: {e}") 
         return jsonify({"reply": "Groq had a hiccup! Check your terminal."})
-
-# ==========================================
-# 7. SERVE HTML PAGES
-# ==========================================
-@app.route('/')
-def serve_index():
-    return send_from_directory('.', 'index.html')
-
-@app.route('/<path:path>')
-def serve_static(path):
-    # Only serve actual files, don't intercept API routes
-    if os.path.isfile(path):
-        return send_from_directory('.', path)
-    return jsonify({"message": "Not found"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
