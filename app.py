@@ -12,7 +12,6 @@ load_dotenv()
 # Get the folder where app.py lives
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# DO NOT set static_folder to '.' — it hijacks API routes
 app = Flask(__name__)
 
 # ==========================================
@@ -20,9 +19,11 @@ app = Flask(__name__)
 # ==========================================
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dharani_secret_key_2026')
 
+# Define your Admin Email here ONCE to avoid typos!
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'dharani@gmail.com')
+
 # Database Configuration
 database_url = os.environ.get('DATABASE_URL', f'sqlite:///{os.path.join(BASE_DIR, "instance", "database.db")}')
-# Neon gives 'postgres://' but SQLAlchemy needs 'postgresql://'
 if database_url.startswith('postgres://'):
     database_url = database_url.replace('postgres://', 'postgresql://', 1)
 
@@ -77,21 +78,16 @@ with app.app_context():
 # ==========================================
 # 4. SERVE HTML/CSS/JS FILES
 # ==========================================
-@app.route('/login', methods=['POST'])
-def login():
-    data = request.json
-    user = User.query.filter_by(email=data['email']).first()
-    
-    if user and check_password_hash(user.password, data['password']):
-        login_user(user)
-        
-        # --- NEW ADMIN CHECK ---
-        # Change this to whatever email you use to register your admin account!
-        is_admin = (user.email == 'dharani@gmail.com') 
-        
-        return jsonify({"message": "Login successful!", "is_admin": is_admin})
-    
-    return jsonify({"message": "Invalid email or password"}), 401
+@app.route('/')
+def serve_index():
+    return send_from_directory(BASE_DIR, 'index.html')
+
+@app.route('/<path:filename>')
+def serve_files(filename):
+    file_path = os.path.join(BASE_DIR, filename)
+    if os.path.isfile(file_path):
+        return send_from_directory(BASE_DIR, filename)
+    return jsonify({"message": "Not found"}), 404
 
 # ==========================================
 # 5. AUTHENTICATION ROUTES
@@ -116,7 +112,9 @@ def login():
     
     if user and check_password_hash(user.password, data['password']):
         login_user(user)
-        return jsonify({"message": "Login successful!"})
+        # Check against our universal admin email variable
+        is_admin = (user.email == ADMIN_EMAIL) 
+        return jsonify({"message": "Login successful!", "is_admin": is_admin})
     
     return jsonify({"message": "Invalid email or password"}), 401
 
@@ -127,27 +125,56 @@ def logout():
     return jsonify({"message": "Logged out!"})
 
 # ==========================================
-# 6. DATABASE EXPENSE ROUTES
+# 6. DATABASE EXPENSE ROUTES (Restored)
 # ==========================================
+@app.route('/save-expense', methods=['POST'])
+@login_required
+def save_expense():
+    data = request.json
+    new_expense = Expense(
+        name=data['name'],
+        amount=data['amount'],
+        date=data['date'],
+        user_id=current_user.id
+    )
+    db.session.add(new_expense)
+    db.session.commit()
+    return jsonify({"message": "Expense saved to database!"})
+
+@app.route('/get-expenses', methods=['GET'])
+@login_required
+def get_expenses():
+    user_expenses = Expense.query.filter_by(user_id=current_user.id).all()
+    output = [{"id": exp.id, "name": exp.name, "amount": exp.amount, "date": exp.date} for exp in user_expenses]
+    return jsonify({"expenses": output})
+
+@app.route('/delete-expense/<int:expense_id>', methods=['DELETE'])
+@login_required
+def delete_expense(expense_id):
+    expense = Expense.query.get(expense_id)
+    if not expense or expense.user_id != current_user.id:
+        return jsonify({"message": "Expense not found"}), 404
+    db.session.delete(expense)
+    db.session.commit()
+    return jsonify({"message": "Expense deleted!"})
+
 # ==========================================
-# ADMIN DASHBOARD ROUTES
+# 7. ADMIN DASHBOARD ROUTES
 # ==========================================
 @app.route('/admin/users', methods=['GET'])
 @login_required
 def get_all_users():
-    # Security: Only let the admin email load this data
-    if current_user.email != 'dharani@gmail.com':
+    if current_user.email != ADMIN_EMAIL:
         return jsonify({"message": "Unauthorized Access"}), 403
         
     users = User.query.all()
-    # Send back everyone EXCEPT the admin
-    output = [{"id": u.id, "fullname": u.fullname, "email": u.email} for u in users if u.email != 'dharani@gmail.com']
+    output = [{"id": u.id, "fullname": u.fullname, "email": u.email} for u in users if u.email != ADMIN_EMAIL]
     return jsonify({"users": output})
 
 @app.route('/admin/user/<int:user_id>/expenses', methods=['GET'])
 @login_required
 def get_user_expenses(user_id):
-    if current_user.email != 'indoorgaming22@gmail.com':
+    if current_user.email != ADMIN_EMAIL:
         return jsonify({"message": "Unauthorized Access"}), 403
         
     user_expenses = Expense.query.filter_by(user_id=user_id).all()
@@ -155,7 +182,7 @@ def get_user_expenses(user_id):
     return jsonify({"expenses": output})
 
 # ==========================================
-# 7. AI ROUTE
+# 8. AI ROUTE
 # ==========================================
 @app.route('/analyze', methods=['POST'])
 @login_required
