@@ -93,12 +93,15 @@ function renderExpenses(expenses) {
 // ==========================================
 // 3. LOGOUT
 // ==========================================
-document.getElementById('admin-logout').onclick = async () => {
+// ==========================================
+// 3. LOGOUT
+// ==========================================
+document.getElementById('admin-logout').onclick = async (e) => {
+    e.preventDefault(); // Stop the link from jumping to the top of the page
     try {
         await fetch(`${API_BASE_URL}/logout`, { credentials: 'include' });
-    } catch (e) {}
+    } catch (e) {
+        console.error("Logout error");
+    }
     window.location.href = "index.html";
 };
-
-// Start
-loadUsers();
