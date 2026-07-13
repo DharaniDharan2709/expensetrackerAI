@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://DharaniGUs.pythonanywhere.com'; // CHANGE THIS TO YOUR PYTHONANYWHERE URL BEFORE DEPLOYING
+const API_BASE_URL = ''; //CHANGE THIS TO YOUR PYTHONANYWHERE URL BEFORE DEPLOYING
 
 // Grab the panels
 const loginPanel = document.getElementById('login-panel');

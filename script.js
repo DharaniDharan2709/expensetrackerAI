@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://DharaniGUs.pythonanywhere.com'; // CHANGE THIS TO YOUR PYTHONANYWHERE URL BEFORE DEPLOYING
+const API_BASE_URL = ''; // CHANGE THIS TO YOUR PYTHONANYWHERE URL BEFORE DEPLOYING
 
 // ==========================================
 // 1. GRAB ELEMENTS FROM YOUR HTML
