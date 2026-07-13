@@ -20,7 +20,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dharani_secret_key_2026')
 
 # Define your Admin Email here ONCE to avoid typos!
-ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'dharani@gmail.com')
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'indoorgaming22@gmail.com')
 
 # Database Configuration
 database_url = os.environ.get('DATABASE_URL', f'sqlite:///{os.path.join(BASE_DIR, "instance", "database.db")}')
